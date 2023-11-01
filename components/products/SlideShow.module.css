@@ -2,8 +2,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-size: cover;
-    height: 350px;
+    background-size: contain;
+    background-position: center;
+    height: 650px;
   }
   
   .each-slide-effect span {

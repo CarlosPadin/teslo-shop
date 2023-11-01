@@ -7,7 +7,6 @@ import {
   CardActionArea,
   CardMedia,
   Grid,
-  Link,
   Typography,
 } from "@mui/material";
 import { IProducts } from "@/interfaces";
@@ -18,6 +17,7 @@ interface Props {
 
 export const ProductCard: FC<Props> = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   return (
     <Grid
@@ -29,23 +29,24 @@ export const ProductCard: FC<Props> = ({ product }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <Card>
-        <NextLink href="/product/slug" prefetch={false}>
+        <NextLink href={`/product/${product.slug}`} prefetch={false}>
           <CardActionArea>
             <CardMedia
               component="img"
               image={
                 isHovered
-                  ? `products/${product.images[1]}`
-                  : `products/${product.images[0]}`
+                  ? `/products/${product.images[1]}`
+                  : `/products/${product.images[0]}`
               }
               alt={product.title}
               className="fadeIn"
+              onLoad={() => setIsImageLoaded(true)}
             />
           </CardActionArea>
         </NextLink>
       </Card>
 
-      <Box className="fadeIn" sx={{ mt: 1 }}>
+      <Box className="fadeIn" sx={{ mt: 1, display: isImageLoaded ? 'block' : 'none' }}>
         <Typography fontWeight={700}>{product.title}</Typography>
         <Typography fontWeight={500}>{"$" + product.price}</Typography>
       </Box>

@@ -1,3 +1,6 @@
+import { useContext, useState } from "react";
+import { useRouter } from "next/router";
+
 import {
   Box,
   Divider,
@@ -24,10 +27,30 @@ import {
   VpnKeyOutlined,
 } from "@mui/icons-material";
 
+import { UiContext } from "@/context";
+
 export const SideMenu = () => {
+  const { isMenuOpen, toggleSideMenu } = useContext(UiContext);
+  const router = useRouter();
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const onSearchHandler = () => {
+    if (searchTerm.trim().length === 0) return;
+
+    toggleSideMenu();
+    router.push(`/search/${searchTerm}`);
+  };
+
+  const naviagateTo = (url: string) => {
+    router.replace(`/category/${url}`);
+    toggleSideMenu();
+  };
+
   return (
     <Drawer
-      open={false}
+      open={isMenuOpen}
+      onClose={toggleSideMenu}
       anchor="right"
       sx={{ backdropFilter: "blur(4px)", transition: "all 0.5s ease-out" }}
     >
@@ -35,11 +58,18 @@ export const SideMenu = () => {
         <List>
           <ListItem>
             <Input
+              autoFocus
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => (e.key === "Enter" ? onSearchHandler() : null)}
               type="text"
               placeholder="Search..."
               endAdornment={
                 <InputAdornment position="end">
-                  <IconButton aria-label="toggle password visibility">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={onSearchHandler}
+                  >
                     <SearchOutlined />
                   </IconButton>
                 </InputAdornment>
@@ -47,49 +77,58 @@ export const SideMenu = () => {
             />
           </ListItem>
 
-          <ListItem button>
+          <ListItem>
             <ListItemIcon>
               <AccountCircleOutlined />
             </ListItemIcon>
             <ListItemText primary={"Profile"} />
           </ListItem>
 
-          <ListItem button>
+          <ListItem>
             <ListItemIcon>
               <ConfirmationNumberOutlined />
             </ListItemIcon>
             <ListItemText primary={"My Orders"} />
           </ListItem>
 
-          <ListItem button sx={{ display: { xs: "", sm: "none" } }}>
+          <ListItem
+            onClick={() => naviagateTo("men")}
+            sx={{ display: { xs: "", sm: "none" } }}
+          >
             <ListItemIcon>
               <MaleOutlined />
             </ListItemIcon>
             <ListItemText primary={"Men"} />
           </ListItem>
 
-          <ListItem button sx={{ display: { xs: "", sm: "none" } }}>
+          <ListItem
+            onClick={() => naviagateTo("women")}
+            sx={{ display: { xs: "", sm: "none" } }}
+          >
             <ListItemIcon>
               <FemaleOutlined />
             </ListItemIcon>
             <ListItemText primary={"Women"} />
           </ListItem>
 
-          <ListItem button sx={{ display: { xs: "", sm: "none" } }}>
+          <ListItem
+            onClick={() => naviagateTo("children")}
+            sx={{ display: { xs: "", sm: "none" } }}
+          >
             <ListItemIcon>
               <EscalatorWarningOutlined />
             </ListItemIcon>
             <ListItemText primary={"Kids"} />
           </ListItem>
 
-          <ListItem button>
+          <ListItem>
             <ListItemIcon>
               <VpnKeyOutlined />
             </ListItemIcon>
             <ListItemText primary={"Log in"} />
           </ListItem>
 
-          <ListItem button>
+          <ListItem>
             <ListItemIcon>
               <LoginOutlined />
             </ListItemIcon>
@@ -100,20 +139,20 @@ export const SideMenu = () => {
           <Divider />
           <ListSubheader>Admin Panel</ListSubheader>
 
-          <ListItem button>
+          <ListItem>
             <ListItemIcon>
               <CategoryOutlined />
             </ListItemIcon>
             <ListItemText primary={"Products"} />
           </ListItem>
-          <ListItem button>
+          <ListItem>
             <ListItemIcon>
               <ConfirmationNumberOutlined />
             </ListItemIcon>
             <ListItemText primary={"Orders"} />
           </ListItem>
 
-          <ListItem button>
+          <ListItem>
             <ListItemIcon>
               <AdminPanelSettings />
             </ListItemIcon>
