@@ -6,6 +6,7 @@ import {
   Card,
   CardActionArea,
   CardMedia,
+  Chip,
   Grid,
   Typography,
 } from "@mui/material";
@@ -31,6 +32,18 @@ export const ProductCard: FC<Props> = ({ product }) => {
       <Card>
         <NextLink href={`/product/${product.slug}`} prefetch={false}>
           <CardActionArea>
+            {product.inStock === 0 && (
+              <Chip
+                color="primary"
+                label="No available"
+                sx={{
+                  position: "absolute",
+                  zIndex: 99,
+                  top: "10px",
+                  left: "10px",
+                }}
+              />
+            )}
             <CardMedia
               component="img"
               image={
@@ -46,7 +59,10 @@ export const ProductCard: FC<Props> = ({ product }) => {
         </NextLink>
       </Card>
 
-      <Box className="fadeIn" sx={{ mt: 1, display: isImageLoaded ? 'block' : 'none' }}>
+      <Box
+        className="fadeIn"
+        sx={{ mt: 1, display: isImageLoaded ? "block" : "none" }}
+      >
         <Typography fontWeight={700}>{product.title}</Typography>
         <Typography fontWeight={500}>{"$" + product.price}</Typography>
       </Box>

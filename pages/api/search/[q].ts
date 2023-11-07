@@ -27,7 +27,7 @@ const searchProduct = async (req: NextApiRequest, res: NextApiResponse<Data>) =>
         return res.status(400).json({message: 'Debe especificar el query de busqueda'});
     }
     
-    q.toString().toLowerCase();
+    q = q.toString().toLowerCase();
 
 
     await db.connect();

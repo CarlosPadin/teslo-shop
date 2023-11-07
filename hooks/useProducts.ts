@@ -6,7 +6,7 @@ import { IProducts } from '@/interfaces';
 
 export const useProducts = (url: string, config?: SWRConfiguration) => {
     // const { data, error, isLoading } = useSWR<IProducts[]>(`/api/${url}`, fetcher, config);
-    const { data, error, isLoading } = useSWR<IProducts[]>(`/api/${url}`, config);
+    const { data, error, isLoading } = useSWR<IProducts[]>(`/api${url}`, config);
 
     return {
         products: data || [],

@@ -5,9 +5,9 @@ import { Product } from "@/models";
 export const getProductBySlug = async (
   slug: string
 ): Promise<IProducts | null> => {
-  db.connect();
+  await db.connect();
   const product = await Product.findOne({ slug }).lean();
-  db.disconnect();
+  await db.disconnect();
 
   if (!product) {
     return null;

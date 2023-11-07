@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import Link from "next/link";
+
 import { CartList, OrderSummary } from "@/components/cart";
 import { ShopLayout } from "@/components/layouts";
 import {
@@ -14,9 +17,11 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import Link from "next/link";
+import { CartContext } from "@/context";
 
 const OrderPage = () => {
+  const {cart} = useContext(CartContext);
+  
   return (
     <ShopLayout
       title="Order Summary 123abc"
@@ -79,7 +84,7 @@ const OrderPage = () => {
                 </Link>
               </Box>
 
-              <OrderSummary />
+              <OrderSummary cart={cart}/>
 
               <Box sx={{ mt: 3 }}>
                 <h1>Pagar</h1>

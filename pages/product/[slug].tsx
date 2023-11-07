@@ -1,20 +1,58 @@
-import { GetServerSideProps, GetStaticPaths, GetStaticProps, NextPage } from 'next';
+import {
+  GetServerSideProps,
+  GetStaticPaths,
+  GetStaticProps,
+  NextPage,
+} from "next";
 
 import { ShopLayout } from "@/components/layouts";
 import { SizeSelector, SlideShow } from "@/components/products";
 import { ItemCounter } from "@/components/ui";
-import { IProducts } from "@/interfaces";
+import { ICartProduct, IProducts, ISizes } from "@/interfaces";
 import { Box, Button, Chip, Divider, Grid, Typography } from "@mui/material";
-import { dbProducts } from '@/database';
+import { dbProducts } from "@/database";
+import { useContext, useState } from "react";
+import { CartContext } from "@/context";
+import { useRouter } from "next/router";
 
 interface Props {
   product: IProducts;
 }
 
-// const product = initialData.products[0];
-
 const ProductPage: NextPage<Props> = ({ product }) => {
+  const { addProductsToCart } = useContext(CartContext);
+  const [tempCartProduct, setTempCartProduct] = useState<ICartProduct>({
+    _id: product._id,
+    image: product.images[0],
+    price: product.price,
+    size: undefined,
+    slug: product.slug,
+    title: product.title,
+    gender: product.gender,
+    quantity: 1,
+  });
+  const router = useRouter();
 
+  const selectedSize = (size: ISizes) => {
+    setTempCartProduct((currentProduct) => ({
+      ...currentProduct,
+      size,
+    }));
+  };
+
+  const selectedQuantity = (quantity: number) => {
+    setTempCartProduct((currentProduct) => ({
+      ...currentProduct,
+      quantity,
+    }));
+  };
+
+  const onAddToCart = () => {
+    if (!tempCartProduct.size) return;
+
+    addProductsToCart(tempCartProduct);
+    router.push("/cart/");
+  };
 
   return (
     <ShopLayout title={product.title} pageDescription={product.description}>
@@ -37,15 +75,31 @@ const ProductPage: NextPage<Props> = ({ product }) => {
             {/* Cantidad */}
             <Box sx={{ my: 2 }}>
               <Typography variant="subtitle1">Items</Typography>
-              <ItemCounter />
-              <SizeSelector sizes={product.sizes} />
+              <ItemCounter
+                currentValue={tempCartProduct.quantity}
+                maxValue={product.inStock}
+                updateQuantity={selectedQuantity}
+              />
+              <SizeSelector
+                sizes={product.sizes}
+                selectedSize={tempCartProduct.size}
+                onSelectedSize={selectedSize}
+              />
             </Box>
 
             {/* Carrito */}
-            <Button color="secondary" className="cicular-btn">
-              Add to Cart
-            </Button>
-            {/* <Chip label='No available items' color="error" variant="outlined" /> */}
+            {product.inStock > 0 ? (
+              <Button
+                color="secondary"
+                className="cicular-btn"
+                onClick={onAddToCart}
+                disabled={!tempCartProduct.size}
+              >
+                {tempCartProduct.size ? "Add to Cart" : "Select a size"}
+              </Button>
+            ) : (
+              <Chip label="No available" color="error" variant="outlined" />
+            )}
 
             {/* Descripcion */}
             <Box mt={3}>
@@ -60,22 +114,20 @@ const ProductPage: NextPage<Props> = ({ product }) => {
   );
 };
 
-export default ProductPage;
-
 // No usar SSR
 // export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 //   const { slug } = params as {slug: string};
 
 //   const product = await dbProducts.getProductBySlug(slug);
 
-  // if(!product) {
-  //   return {
-  //     redirect: {
-  //       destination: '/',
-  //       permanent: false,
-  //     }
-  //   }
-  // }
+// if(!product) {
+//   return {
+//     redirect: {
+//       destination: '/',
+//       permanent: false,
+//     }
+//   }
+// }
 
 //   return {
 //     props: {
@@ -88,27 +140,27 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
   const productSlugs = await dbProducts.getAllProductsBySlug();
 
   return {
-    paths: productSlugs.map(({slug}) => ({
+    paths: productSlugs.map(({ slug }) => ({
       params: {
-        slug
-      }
+        slug,
+      },
     })),
-    fallback: "blocking"
-  }
-}
+    fallback: "blocking",
+  };
+};
 
-export const getStaticProps: GetStaticProps = async ({ params}) => {
-  const { slug = ''} = params as {slug: string};
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const { slug = "" } = params as { slug: string };
 
   const productsBySlug = await dbProducts.getProductBySlug(slug);
 
-  if(!productsBySlug) {
+  if (!productsBySlug) {
     return {
       redirect: {
-        destination: '/',
+        destination: "/",
         permanent: false,
-      }
-    }
+      },
+    };
   }
 
   return {
@@ -116,5 +168,7 @@ export const getStaticProps: GetStaticProps = async ({ params}) => {
       product: productsBySlug,
     },
     revalidate: 84600,
-  }
-}
+  };
+};
+
+export default ProductPage;
